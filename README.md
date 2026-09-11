@@ -31,6 +31,9 @@ nothing here changes. That is the point.
 
 ## Quickstart
 
+Docker is the supported path and needs nothing else installed. To run the five
+services bare instead (`make dev`), you need Python 3.10 or newer.
+
 ```bash
 git clone https://github.com/sidprobstein/private-llm-reference
 cd private-llm-reference

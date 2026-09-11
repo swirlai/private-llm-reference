@@ -1,0 +1,7 @@
+# Pinned so the demo builds the same way in a year. Versions match the repo venv.
+fastapi==0.141.1
+uvicorn==0.52.4
+pydantic==2.13.5
+PyJWT==2.13.0
+cryptography==50.0.1
+python-multipart==0.0.32

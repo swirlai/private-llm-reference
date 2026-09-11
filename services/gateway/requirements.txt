@@ -1,0 +1,8 @@
+# Pinned to the versions this repo is developed and tested against.
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+httpx==0.28.1
+mcp==2.2.0
+mcp-types==2.2.0
+PyJWT==2.13.0
+pydantic==2.13.5

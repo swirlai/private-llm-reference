@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Environments
+.venv/
+venv/
+.env
+.env.local
+
+# Docker / compose artifacts
+docker-compose.override.yml
+*.pid
+.docker/
+
+# Demo recording scratch
+*.cast
+*.gif
+demos/out/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+
+# Design and handoff documents live in claude_work, never in a code repo.
+# See reference/SWIRL-CLAUDE.md. Anything matching these belongs there.
+DESIGN_*.md
+*HANDOFF*.md
+SPEC.md

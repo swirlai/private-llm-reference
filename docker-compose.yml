@@ -1,0 +1,119 @@
+# Five services, one network, no secrets on disk. The IdP mints a demo RSA
+# keypair at startup; nothing here reads a credential from the host.
+#
+# Service names matter: they are the DNS names baked into the URLs below and
+# into the `aud` checks each service performs. Renaming a service breaks the
+# audience story, not just the routing.
+
+# Every service gets the same identifier block. One anchor means the gateway and
+# the MCP servers cannot drift into disagreeing about what CONTRACTS_RESOURCE
+# is, which is exactly the kind of drift beat 2 punishes.
+x-shared-env: &shared-env
+  ISSUER_URL: ${ISSUER_URL:-http://idp:8081}
+  GATEWAY_RESOURCE: ${GATEWAY_RESOURCE:-https://gateway.corp.internal}
+  CONTRACTS_RESOURCE: ${CONTRACTS_RESOURCE:-https://mcp.corp.internal/contracts}
+  TICKETS_RESOURCE: ${TICKETS_RESOURCE:-https://mcp.corp.internal/tickets}
+  CONTRACTS_API_URL: ${CONTRACTS_API_URL:-http://contracts-api:8091}
+  MCP_CONTRACTS_URL: ${MCP_CONTRACTS_URL:-http://mcp-contracts:8092/mcp}
+  MCP_TICKETS_URL: ${MCP_TICKETS_URL:-http://mcp-tickets:8093/mcp}
+  VALIDATE_TOKEN_RESOURCE: ${VALIDATE_TOKEN_RESOURCE:-true}
+  MODEL_BACKEND: ${MODEL_BACKEND:-ollama}
+  MODEL_BASE_URL: ${MODEL_BASE_URL:-http://host.docker.internal:11434/v1}
+  MODEL_NAME: ${MODEL_NAME:-qwen3:8b}
+  EMAIL_ALLOWED_DOMAINS: ${EMAIL_ALLOWED_DOMAINS:-corp.internal}
+  PYTHONUNBUFFERED: "1"
+
+# Healthchecks use python rather than curl so they do not depend on what each
+# service's Dockerfile happens to install.
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 5s
+  timeout: 3s
+  retries: 24
+  start_period: 5s
+
+services:
+  idp:
+    build: ./services/idp
+    container_name: idp
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *shared-env
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/healthz', timeout=2)"]
+    networks: [corp]
+
+  contracts-api:
+    build: ./services/contracts_api
+    container_name: contracts-api
+    ports:
+      - "8091:8091"
+    environment:
+      <<: *shared-env
+    depends_on:
+      idp:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8091/healthz', timeout=2)"]
+    networks: [corp]
+
+  mcp-contracts:
+    build: ./services/mcp_contracts
+    container_name: mcp-contracts
+    ports:
+      - "8092:8092"
+    environment:
+      <<: *shared-env
+    depends_on:
+      idp:
+        condition: service_healthy
+      contracts-api:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8092/healthz', timeout=2)"]
+    networks: [corp]
+
+  mcp-tickets:
+    build: ./services/mcp_tickets
+    container_name: mcp-tickets
+    ports:
+      - "8093:8093"
+    environment:
+      <<: *shared-env
+    depends_on:
+      idp:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8093/healthz', timeout=2)"]
+    networks: [corp]
+
+  gateway:
+    build: ./services/gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *shared-env
+    # Linux does not resolve host.docker.internal by default, and the default
+    # MODEL_BASE_URL points at an Ollama running on the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      idp:
+        condition: service_healthy
+      mcp-contracts:
+        condition: service_healthy
+      mcp-tickets:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz', timeout=2)"]
+    networks: [corp]
+
+networks:
+  corp:
+    name: private-llm-corp

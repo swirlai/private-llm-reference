@@ -15,6 +15,7 @@ script prints every command it runs.
 from __future__ import annotations
 
 import os
+import shlex
 import subprocess
 import sys
 
@@ -45,7 +46,11 @@ from _common import (  # noqa: E402
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-FLIP_CMD = [
+# How to restart the tickets server with a different VALIDATE_TOKEN_RESOURCE.
+# Docker is the default. Set FLIP_CMD in the environment to override it, which is
+# what a bare `make dev` stack needs since there is no compose project to recreate:
+#   FLIP_CMD="./scripts/restart-tickets.sh" python demos/02_wrong_audience.py --auto-flip
+FLIP_CMD = shlex.split(os.environ["FLIP_CMD"]) if os.environ.get("FLIP_CMD") else [
     "docker",
     "compose",
     "up",

@@ -200,12 +200,15 @@ def main():
     contracts_token = response.json()["access_token"]
     kv("POST", "/token   grant_type=token-exchange")
     kv("resource", CONTRACTS_RESOURCE)
-    kv("scope", "contracts.read")
+    kv("scope", "contracts.read tickets.write   " + dim("(both, on purpose: see below)"))
     print()
     show_claims("exchanged token", contracts_token)
-    say(dim("  sub is still alice. act says the gateway did the exchanging. The scope"))
-    say(dim("  narrowed to what this one server needs. This is a correct, boring,"))
-    say(dim("  everyday token."))
+    say(dim("  sub is still alice. act says the gateway did the exchanging. aud is now"))
+    say(dim("  the contracts server. This is a correct, boring, everyday token."))
+    print()
+    say(dim("  A real gateway narrows scope per target, and this one does on /v1/ask."))
+    say(dim("  Here we deliberately keep both scopes, so that when the replay below is"))
+    say(dim("  refused, the audience check is the only thing that can have refused it."))
     pause(1.5)
 
     section("3. Control: use the token where it belongs")
@@ -244,7 +247,7 @@ def main():
         print(bold("  Put it back:"))
         print()
         print("      VALIDATE_TOKEN_RESOURCE=true \\")
-        print("        docker compose up -d --force-recreate --no-deps mcp-tickets")
+        print("        " + " ".join(FLIP_CMD))
         print()
     else:
         accepted_panel(result)

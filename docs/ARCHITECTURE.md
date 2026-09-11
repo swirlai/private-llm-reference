@@ -158,6 +158,14 @@ person. That is the property that makes the log admissible in an incident review
 
 ## Sequence
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="diagrams/request-path-dark.svg">
+  <img alt="Sequence diagram of one request: the gateway logs alice in, exchanges her token per target MCP server, the contracts API trims results by her groups, the model emits an exfiltration tool call, and the recipient allowlist refuses it" src="diagrams/request-path-light.svg">
+</picture>
+
+<details>
+<summary>Mermaid source for the diagram above</summary>
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -193,6 +201,8 @@ sequenceDiagram
     G->>G: audit: attempted, refused, by whom
     G-->>U: answer + blocked[]
 ```
+
+</details>
 
 ## Where a failure stops
 

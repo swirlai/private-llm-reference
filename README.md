@@ -180,6 +180,14 @@ nothing to alert on.
 
 ## Architecture
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/architecture-dark.svg">
+  <img alt="Architecture: a gateway fronting an IdP, two MCP servers and an ACL-trimming contracts API, all inside a private network, with the model reachable over an OpenAI-compatible API" src="docs/diagrams/architecture-light.svg">
+</picture>
+
+<details>
+<summary>Mermaid source for the diagram above</summary>
+
 ```mermaid
 flowchart LR
     U[user] -->|POST /v1/ask, X-Virtual-Key| G
@@ -203,6 +211,8 @@ flowchart LR
     MC -->|verify aud| I
     MT -->|verify aud| I
 ```
+
+</details>
 
 `docs/ARCHITECTURE.md` walks the same path hop by hop and lists the exact claims
 present in the token at each one.

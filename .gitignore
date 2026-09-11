@@ -20,6 +20,8 @@ docker-compose.override.yml
 # Demo recording scratch
 *.cast
 *.gif
+# ...except the recorded beat-2 demo, which the README embeds.
+!docs/beat2-wrong-audience.gif
 demos/out/
 
 # Editors and OS

@@ -29,6 +29,19 @@ membership at the data rather than in the prompt, and a gateway that is the only
 component allowed to talk to the model. Swap the model for a different one and
 nothing here changes. That is the point.
 
+## What it looks like
+
+Beat 2, the wrong-audience token, in one continuous take. A token minted for the
+contracts MCP server is replayed against the tickets server and refused with a
+401 and a real `WWW-Authenticate` challenge. Then `VALIDATE_TOKEN_RESOURCE` is
+turned off and the identical replay returns 200.
+
+![Beat 2: a token minted for the contracts server is refused by the tickets server, then accepted once the audience check is disabled](docs/beat2-wrong-audience.gif)
+
+No model runs in that recording. Nothing about it depends on one. That is the
+point: a prompt cannot stop a token from being replayed, and a one-line audience
+check can.
+
 ## Quickstart
 
 Docker is the supported path and needs nothing else installed. To run the five

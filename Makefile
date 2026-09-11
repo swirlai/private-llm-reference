@@ -19,7 +19,7 @@ DEV_ENV := \
 	PYTHONUNBUFFERED=1
 
 .DEFAULT_GOAL := help
-.PHONY: help up down logs dev demo test fmt
+.PHONY: help up down logs dev demo test fmt diagrams
 
 help: ## List targets
 	@grep -E '^[a-z-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':.*?## ' '{printf "  %-8s %s\n", $$1, $$2}'
@@ -76,3 +76,6 @@ fmt: ## Format and lint if ruff is installed, syntax-check either way
 	  echo "ruff not installed (.venv/bin/pip install ruff); syntax check only"; \
 	fi
 	@$(PY) -m compileall -q common demos services tests >/dev/null && echo "syntax ok"
+
+diagrams: ## Regenerate docs/diagrams/*.svg from the mermaid source in the markdown
+	@./scripts/render-diagrams.sh

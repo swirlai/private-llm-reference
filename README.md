@@ -274,8 +274,9 @@ lesson.
 ## The article
 
 This repository is the companion to the article on private enterprise LLM
-deployment. The article makes the argument; this makes it run. Link in the
-repository description.
+deployment. The article makes the argument; this makes it run.
+
+**[Build Your Own Private LLM: A 2026 Reference Architecture for the Enterprise](https://dev.to/sidswirl/build-your-own-private-llm-a-2026-reference-architecture-for-the-enterprise-1l89)**
 
 ## License
 
